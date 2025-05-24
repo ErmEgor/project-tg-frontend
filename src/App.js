@@ -117,7 +117,7 @@ function App() {
         </div>
       </section>
       <section className="contact-form">
-        <h2>За,linebreakЗакажи бота</h2>
+        <h2>Заказать услуги</h2>
         <input
           type="text"
           name="name"
