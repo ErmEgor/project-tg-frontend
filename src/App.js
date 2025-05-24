@@ -56,7 +56,7 @@ function App() {
   // Отправка данных на сервер
   const sendToServer = async () => {
     try {
-      const response = await fetch('YOUR_RENDER_BOT_URL/submit', {  // Замени на URL бота после деплоя
+      const response = await fetch('https://telegram-bot-k3q0.onrender.com/submit', {  // Замени на URL бота после деплоя
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
