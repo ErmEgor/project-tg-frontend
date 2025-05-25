@@ -6,49 +6,49 @@ import React, { useEffect, useState } from 'react';
      const [formData, setFormData] = useState({ name: '', message: '' });
 
      useEffect(() => {
-       const tg = window.Telegram?.WebApp;
-       if (tg) {
-         console.log('Telegram Web App инициализирован:', tg.initDataUnsafe);
-         tg.ready();
-         tg.expand();
-         if (tg.initDataUnsafe?.user) {
-           setUser(tg.initDataUnsafe.user);
-           setFormData((prev) => ({ ...prev, name: tg.initDataUnsafe.user.first_name || '' }));
-         }
-       } else {
-         console.log('Эмуляция Telegram Web App для локального теста');
-         window.Telegram = {
-           WebApp: {
-             initDataUnsafe: { user: { id: 12345, first_name: "Test", last_name: "" } },
-             ready: () => console.log('WebApp ready'),
-             expand: () => {},
-             sendData: async (data) => {
-               console.log('Эмуляция tg.sendData, данные:', data);
-               try {
-                 const response = await fetch('https://project-tg-server.onrender.com/submit', {  // Замените на ваш URL
-                   method: 'POST',
-                   headers: { 'Content-Type': 'application/json' },
-                   body: data
-                 });
-                 const result = await response.json();
-                 console.log('Ответ сервера:', result);
-                 if (response.ok) {
-                   alert('Заявка отправлена через сервер!');
-                 } else {
-                   alert(`Ошибка: ${result.message || 'Неизвестная ошибка'}`);
-                 }
-               } catch (error) {
-                 console.error('Ошибка при выполнении fetch:', error);
-                 alert('Ошибка при отправке заявки: сервер недоступен');
-               }
-             },
-             close: () => alert('Приложение закрыто')
-           }
-         };
-         setUser(window.Telegram.WebApp.initDataUnsafe.user);
-         setFormData((prev) => ({ ...prev, name: window.Telegram.WebApp.initDataUnsafe.user.first_name || '' }));
-       }
-     }, []);
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    console.log('Telegram Web App инициализирован:', tg.initDataUnsafe);
+    tg.ready();
+    tg.expand();
+    if (tg.initDataUnsafe?.user) {
+      setUser(tg.initDataUnsafe.user);
+      setFormData((prev) => ({ ...prev, name: tg.initDataUnsafe.user.first_name || '' }));
+    }
+  } else if (process.env.NODE_ENV === 'development') { // Только для локального тестирования
+    console.log('Эмуляция Telegram Web App для локального теста');
+    window.Telegram = {
+      WebApp: {
+        initDataUnsafe: { user: { id: 12345, first_name: "Test", last_name: "" } },
+        ready: () => console.log('WebApp ready'),
+        expand: () => {},
+        sendData: async (data) => {
+          console.log('Эмуляция tg.sendData, данные:', data);
+          try {
+            const response = await fetch('http://localhost:5000/submit', { // Локальный сервер для тестов
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: data
+            });
+            const result = await response.json();
+            console.log('Ответ сервера:', result);
+            if (response.ok) {
+              alert('Заявка отправлена через сервер (эмуляция)!');
+            } else {
+              alert(`Ошибка: ${result.message || 'Неизвестная ошибка'}`);
+            }
+          } catch (error) {
+            console.error('Ошибка при выполнении fetch:', error);
+            alert('Ошибка при отправке заявки: сервер недоступен');
+          }
+        },
+        close: () => alert('Приложение закрыто (эмуляция)')
+      }
+    };
+    setUser(window.Telegram.WebApp.initDataUnsafe.user);
+    setFormData((prev) => ({ ...prev, name: window.Telegram.WebApp.initDataUnsafe.user.first_name || '' }));
+  }
+}, []);
 
      const handleInputChange = (e) => {
        const { name, value } = e.target;
