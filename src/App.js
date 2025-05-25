@@ -83,7 +83,7 @@ import React, { useEffect, useState } from 'react';
      const sendToServer = async () => {
        try {
          console.log('Отправляем POST-запрос на сервер:', formData);
-         const response = await fetch('https://your-server-name.onrender.com/submit', {  // Замените на ваш URL
+         const response = await fetch('https://project-tg-server.onrender.com/submit', {  // Замените на ваш URL
            method: 'POST',
            headers: { 'Content-Type': 'application/json' },
            body: JSON.stringify(formData)
