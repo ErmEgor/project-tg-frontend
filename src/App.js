@@ -9,15 +9,17 @@ function App() {
   useEffect(() => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
-      console.log('Telegram Web App инициализирован');
+      console.log('Telegram Web App инициализирован:', tg.initDataUnsafe);
       tg.ready();
       tg.expand();
       if (tg.initDataUnsafe?.user) {
         setUser(tg.initDataUnsafe.user);
         setFormData((prev) => ({ ...prev, name: tg.initDataUnsafe.user.first_name || '' }));
+      } else {
+        console.log('Пользователь не авторизован в Telegram Web App');
       }
     } else {
-      console.log('Telegram Web App недоступен');
+      console.error('Telegram Web App недоступен');
     }
   }, []);
 
@@ -29,47 +31,53 @@ function App() {
 
   // Отправка данных
   const sendDataToBot = async () => {
+    if (!formData.name || !formData.message) {
+      alert('Заполните все поля формы!');
+      return;
+    }
+
     const tg = window.Telegram?.WebApp;
-    if (formData.name && formData.message) {
-      if (tg) {
-        // Попытка отправки через Telegram Web App
-        try {
-          console.log('Отправляем через tg.sendData:', formData);
-          const data = JSON.stringify(formData);
-          tg.sendData(data);
-          setFormData({ name: user?.first_name || '', message: '' });
-          alert('Заявка отправлена боту!');
-        } catch (error) {
-          console.error('Ошибка tg.sendData:', error);
-          // Fallback на сервер
-          await sendToServer();
-        }
-      } else {
-        // Отправка через сервер
+    if (tg && tg.initDataUnsafe?.user) {
+      // Попытка отправки через Telegram Web App
+      try {
+        console.log('Отправляем через tg.sendData:', formData);
+        const data = JSON.stringify(formData);
+        tg.sendData(data);
+        console.log('Данные отправлены через tg.sendData');
+        setFormData({ name: user?.first_name || '', message: '' });
+        alert('Заявка отправлена боту!');
+      } catch (error) {
+        console.error('Ошибка tg.sendData:', error);
+        // Fallback на сервер
         await sendToServer();
       }
     } else {
-      alert('Заполните все поля формы!');
+      console.log('Telegram Web App недоступен, отправляем через сервер');
+      await sendToServer();
     }
   };
 
   // Отправка данных на сервер
   const sendToServer = async () => {
     try {
-      const response = await fetch('https://telegram-bot-k3q0.onrender.com/submit', {  // Замени на URL бота после деплоя
+      console.log('Отправляем POST-запрос на сервер:', formData);
+      const response = await fetch('https://telegram-bot-k3q0.onrender.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
+      const result = await response.json();
+      console.log('Ответ сервера:', result);
       if (response.ok) {
-        alert('Заявка отправлена!');
+        alert('Заявка отправлена через сервер!');
         setFormData({ name: user?.first_name || '', message: '' });
       } else {
-        alert('Ошибка при отправке заявки.');
+        console.error('Ошибка сервера:', result);
+        alert(`Ошибка при отправке заявки: ${result.message || 'Неизвестная ошибка'}`);
       }
     } catch (error) {
       console.error('Ошибка отправки на сервер:', error);
-      alert('Ошибка при отправке заявки.');
+      alert('Ошибка при отправке заявки: сервер недоступен');
     }
   };
 
