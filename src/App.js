@@ -7,38 +7,37 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      console.log('Telegram Web App инициализирован:', tg.initDataUnsafe);
-      tg.ready();
-      tg.expand();
-      if (tg.initDataUnsafe?.user) {
-        console.log('Данные пользователя:', tg.initDataUnsafe.user);
-        setUser(tg.initDataUnsafe.user);
-        setFormData((prev) => {
-          const newFormData = {
-            ...prev,
-            name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`
-          };
-          console.log('Установлен formData:', newFormData);
-          return newFormData;
-        });
-      } else {
-        console.log('Пользователь не найден в tg.initDataUnsafe');
-        setUser({ id: 'unknown', first_name: 'Аноним' });
-        setFormData((prev) => {
-          const newFormData = { ...prev, name: 'Аноним' };
-          console.log('Установлен formData:', newFormData);
-          return newFormData;
-        });
-      }
+  console.log('Проверка Telegram Web App:', window.Telegram?.WebApp);
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    console.log('Telegram Web App инициализирован:', tg.initDataUnsafe);
+    tg.ready();
+    tg.expand();
+    if (tg.initDataUnsafe?.user) {
+      console.log('Данные пользователя:', tg.initDataUnsafe.user);
+      setUser(tg.initDataUnsafe.user);
+      setFormData((prev) => {
+        const newFormData = {
+          ...prev,
+          name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`
+        };
+        console.log('Установлен formData:', newFormData);
+        return newFormData;
+      });
     } else {
-      console.error('Telegram Web App недоступен. Запустите приложение через Telegram.');
-      alert('Пожалуйста, откройте приложение через Telegram.');
+      console.log('Пользователь не найден в tg.initDataUnsafe');
       setUser({ id: 'unknown', first_name: 'Аноним' });
-      setFormData((prev) => ({ ...prev, name: 'Аноним' }));
+      setFormData((prev) => {
+        const newFormData = { ...prev, name: 'Аноним' };
+        console.log('Установлен formData:', newFormData);
+        return newFormData;
+      });
     }
-  }, []);
+  } else {
+    console.error('Telegram Web App недоступен. Проверь URL в BotFather или перезапусти приложение.');
+    alert('Пожалуйста, убедитесь, что URL приложения настроен правильно в BotFather.');
+  }
+}, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
