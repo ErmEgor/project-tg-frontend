@@ -7,14 +7,27 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+  // Добавляем параметр кэширования
+  const cacheBust = new Date().getTime();
+  const scripts = document.getElementsByTagName('script');
+  for (let script of scripts) {
+    if (script.src.includes('static/js')) {
+      script.src = script.src.split('?')[0] + `?v=${cacheBust}`;
+    }
+  }
+  const links = document.getElementsByTagName('link');
+  for (let link of links) {
+    if (link.href.includes('static/css')) {
+      link.href = link.href.split('?')[0] + `?v=${cacheBust}`;
+    }
+  }
+
   const tg = window.Telegram?.WebApp;
   if (tg) {
-    alert('Web App инициализирован успешно');
+    alert(`Web App инициализирован, cacheBust: ${cacheBust}`);
     tg.ready();
     tg.expand();
-    alert('initData: ' + JSON.stringify(tg.initDataUnsafe));
     if (tg.initDataUnsafe?.user) {
-      alert(`Пользователь: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
       setUser(tg.initDataUnsafe.user);
       setFormData((prev) => ({
         ...prev,
@@ -22,11 +35,9 @@ function App() {
       }));
     } else {
       alert('Пользователь не найден в tg.initDataUnsafe');
-      setUser({ id: 'unknown', first_name: 'Аноним' });
-      setFormData((prev) => ({ ...prev, name: 'Аноним' }));
     }
   } else {
-    alert('Telegram Web App не инициализирован. Проверьте URL в BotFather и убедитесь, что открываете через Telegram.');
+    alert('Telegram Web App не инициализирован. Проверьте URL в BotFather.');
   }
 }, []);
 
