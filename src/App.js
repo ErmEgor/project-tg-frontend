@@ -7,30 +7,28 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      alert('Telegram Web App инициализирован');
-      tg.ready();
-      tg.expand();
-      if (tg.initDataUnsafe?.user) {
-        alert(`Данные пользователя: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
-        setUser(tg.initDataUnsafe.user);
-        setFormData((prev) => {
-          const newFormData = {
-            ...prev,
-            name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`
-          };
-          return newFormData;
-        });
-      } else {
-        alert('Пользователь не найден в tg.initDataUnsafe');
-        setUser({ id: 'unknown', first_name: 'Аноним' });
-        setFormData((prev) => ({ ...prev, name: 'Аноним' }));
-      }
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    alert('Web App инициализирован успешно');
+    tg.ready();
+    tg.expand();
+    alert('initData: ' + JSON.stringify(tg.initDataUnsafe));
+    if (tg.initDataUnsafe?.user) {
+      alert(`Пользователь: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
+      setUser(tg.initDataUnsafe.user);
+      setFormData((prev) => ({
+        ...prev,
+        name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
+      }));
     } else {
-      alert('Telegram Web App не инициализирован. Проверьте URL в BotFather и убедитесь, что открываете через Telegram.');
+      alert('Пользователь не найден в tg.initDataUnsafe');
+      setUser({ id: 'unknown', first_name: 'Аноним' });
+      setFormData((prev) => ({ ...prev, name: 'Аноним' }));
     }
-  }, []);
+  } else {
+    alert('Telegram Web App не инициализирован. Проверьте URL в BotFather и убедитесь, что открываете через Telegram.');
+  }
+}, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
