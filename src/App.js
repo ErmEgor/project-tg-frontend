@@ -1,43 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({ name: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
-  const tg = window.Telegram?.WebApp;
-  console.log('Проверка Telegram.WebApp:', tg ? 'Найден' : 'Не найден');
-  if (tg) {
-    console.log('Web App инициализирован');
-    console.log('initDataUnsafe:', JSON.stringify(tg.initDataUnsafe, null, 2));
-    tg.ready();
-    tg.expand();
-    if (tg.initDataUnsafe?.user) {
-      console.log('Пользователь:', JSON.stringify(tg.initDataUnsafe.user, null, 2));
-      alert(`Пользователь: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
-      setUser(tg.initDataUnsafe.user);
-      setFormData((prev) => ({
-        ...prev,
-        name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
-      }));
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      alert('Web App инициализирован: ' + JSON.stringify(tg.initDataUnsafe));
+      tg.ready();
+      tg.expand();
+      if (tg.initDataUnsafe?.user) {
+        alert(`Пользователь: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
+        setUser(tg.initDataUnsafe.user);
+        setFormData((prev) => ({
+          ...prev,
+          name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
+        }));
+      } else {
+        alert('Пользователь не найден в initDataUnsafe');
+      }
+      // Установить фокус на textarea при загрузке
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+        alert('Попытка установить фокус на textarea');
+      }
     } else {
-      console.log('Пользователь не найден в initDataUnsafe');
-      alert('Пользователь не найден в initDataUnsafe');
-      console.log('Полный initDataUnsafe:', JSON.stringify(tg.initDataUnsafe, null, 2));
+      alert('Telegram Web App не инициализирован');
     }
-  } else {
-    console.log('Telegram Web App не инициализирован');
-    alert('Telegram Web App не инициализирован');
-  }
-}, []);
+  }, []);
 
   const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  alert(`Input changed: name=${name}, value=${value}`);
-  setFormData((prev) => ({ ...prev, [name]: value }));
-};
+    const { name, value } = e.target;
+    alert(`Input changed: name=${name}, value=${value}`);
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const sendDataToBot = async () => {
     if (isSubmitting) return;
@@ -45,7 +45,6 @@ function App() {
       alert('Заполните все поля формы!');
       return;
     }
-
     setIsSubmitting(true);
     const tg = window.Telegram?.WebApp;
     if (tg && tg.initDataUnsafe?.user) {
@@ -55,7 +54,7 @@ function App() {
         setFormData({ name: user?.first_name || `Пользователь ${user?.id}`, message: '' });
         alert('Заявка отправлена боту!');
       } catch (error) {
-        alert('Ошибка при отправке через Telegram, пробуем через сервер');
+        alert('Ошибка при отправке через Telegram: ' + error.message);
         await sendToServer();
       }
     } else {
@@ -105,14 +104,14 @@ function App() {
       </header>
       <section className="skills">
         <h2>Мои навыки</h2>
-        <p>Я создаю Telegram-ботов и веб-приложения. Мои проекты — это сочетание функциональности, современного дизайна и удобства.</p>
+        <p>Я создаю Telegram-приложения и веб-приложения. Мои проекты — это сочетание функциональности и красоты.</p>
       </section>
       <section className="projects">
         <h2>Мои проекты</h2>
         <div className="project-grid">
           <div className="project-card">
             <h3>Лендинг</h3>
-            <p>Одностраничный сайт с красивым дизайном и рабочими кнопками.</p>
+            <p>Одностраничный сайт с красивым дизайном.</p>
             <a href="https://ermegor.github.io/BuildMax/" target="_blank" rel="noopener noreferrer" className="project-button">
               Посмотреть
             </a>
@@ -137,19 +136,20 @@ function App() {
           className="input-field"
         />
         <textarea
-        name="message"
-        value={formData.message}
-        onChange={handleInputChange}
-        onKeyDown={(e) => alert(`Key pressed: ${e.key}`)}
-        onFocus={() => alert('Textarea focused')}
-        placeholder="Опиши, какой бот нужен"
-        className="input-field textarea"
-        autoFocus
-        onClick={() => {
-          alert('Textarea clicked');
-          e.target.focus();
-        }}
+          name="message"
+          defaultValue={formData.message}
+          onChange={handleInputChange}
+          onKeyDown={(e) => alert(`Key pressed: ${e.key}`)}
+          onFocus={() => alert('Textarea focused')}
+          onClick={(e) => {
+            alert('Textarea clicked');
+            e.target.focus();
+          }}
+          placeholder="Опиши, какой бот нужен"
+          className="input-field textarea"
+          autoFocus
         />
+        <p>Текущий текст в textarea: {formData.message}</p>
         <button onClick={sendDataToBot} disabled={isSubmitting}>
           {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
         </button>
