@@ -34,9 +34,10 @@ function App() {
 }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const { name, value } = e.target;
+  console.log(`Input changed: name=${name}, value=${value}`);
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
 
   const sendDataToBot = async () => {
     if (isSubmitting) return;
