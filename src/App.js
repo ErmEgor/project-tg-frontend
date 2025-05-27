@@ -18,37 +18,30 @@ function App() {
           name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
         }));
       }
-      // Прокрутка к верху страницы
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 100);
     }
   }, []);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`Input changed: name=${name}, value=${value}`);
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const handleKeyDown = (e) => {
     console.log(`Key pressed: ${e.key}`);
     if (e.key.length === 1) {
       setFormData((prev) => {
         const newValue = prev.message + e.key;
-        console.log(`Manually updated value: ${newValue}`);
+        console.log(`Updated value: ${newValue}`);
         return { ...prev, message: newValue };
       });
     } else if (e.key === 'Backspace') {
       setFormData((prev) => {
         const newValue = prev.message.slice(0, -1);
-        console.log(`Manually updated value: ${newValue}`);
+        console.log(`Updated value: ${newValue}`);
         return { ...prev, message: newValue };
       });
     } else if (e.key === 'Enter') {
       setFormData((prev) => {
         const newValue = prev.message + '\n';
-        console.log(`Manually updated value: ${newValue}`);
+        console.log(`Updated value: ${newValue}`);
         return { ...prev, message: newValue };
       });
       e.preventDefault();
@@ -147,14 +140,13 @@ function App() {
           type="text"
           name="name"
           value={formData.name}
-          onChange={handleInputChange}
+          onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
           placeholder="Твоё имя"
           className="input-field"
         />
         <textarea
           name="message"
           value={formData.message}
-          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Опиши, какой бот нужен"
           className="input-field textarea"
