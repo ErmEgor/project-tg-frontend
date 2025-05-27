@@ -8,13 +8,14 @@ function App() {
 
   useEffect(() => {
   const tg = window.Telegram?.WebApp;
-  alert('Проверка Telegram.WebApp: ' + (tg ? 'Найден' : 'Не найден'));
+  console.log('Проверка Telegram.WebApp:', tg ? 'Найден' : 'Не найден');
   if (tg) {
-    alert('Web App инициализирован');
+    console.log('Web App инициализирован');
+    console.log('initDataUnsafe:', JSON.stringify(tg.initDataUnsafe, null, 2));
     tg.ready();
     tg.expand();
-    alert('initData: ' + JSON.stringify(tg.initDataUnsafe));
     if (tg.initDataUnsafe?.user) {
+      console.log('Пользователь:', JSON.stringify(tg.initDataUnsafe.user, null, 2));
       alert(`Пользователь: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
       setUser(tg.initDataUnsafe.user);
       setFormData((prev) => ({
@@ -22,10 +23,13 @@ function App() {
         name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
       }));
     } else {
-      alert('Пользователь не найден в tg.initDataUnsafe');
+      console.log('Пользователь не найден в initDataUnsafe');
+      alert('Пользователь не найден в initDataUnsafe');
+      console.log('Полный initDataUnsafe:', JSON.stringify(tg.initDataUnsafe, null, 2));
     }
   } else {
-    alert('Telegram Web App не инициализирован. Проверьте URL в BotFather.');
+    console.log('Telegram Web App не инициализирован');
+    alert('Telegram Web App не инициализирован');
   }
 }, []);
 
