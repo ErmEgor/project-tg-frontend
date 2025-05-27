@@ -35,7 +35,7 @@ function App() {
 
   const handleInputChange = (e) => {
   const { name, value } = e.target;
-  console.log(`Input changed: name=${name}, value=${value}`);
+  alert(`Input changed: name=${name}, value=${value}`);
   setFormData((prev) => ({ ...prev, [name]: value }));
 };
 
@@ -137,11 +137,13 @@ function App() {
           className="input-field"
         />
         <textarea
-          name="message"
-          value={formData.message}
-          onChange={handleInputChange}
-          placeholder="Опиши, какой бот нужен"
-          className="input-field textarea"
+        name="message"
+        value={formData.message}
+        onChange={handleInputChange}
+        onKeyDown={(e) => alert(`Key pressed: ${e.key}`)}
+        onFocus={() => alert('Textarea focused')}
+        placeholder="Опиши, какой бот нужен"
+        className="input-field textarea"
         />
         <button onClick={sendDataToBot} disabled={isSubmitting}>
           {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
