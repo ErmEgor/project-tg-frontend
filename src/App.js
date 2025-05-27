@@ -28,10 +28,23 @@ import React, { useEffect, useState } from 'react';
      }, []);
 
      const handleInputChange = (e) => {
-       const { name, value } = e.target;
-       alert(`Input changed: name=${name}, value=${value}`);
-       setFormData((prev) => ({ ...prev, [name]: value }));
-     };
+  const { name, value } = e.target;
+  alert(`Input changed: name=${name}, value=${value}`);
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
+
+const handleKeyDown = (e) => {
+  alert(`Key pressed: ${e.key}`);
+  if (e.key.length === 1 || e.key === 'Backspace') {
+    setFormData((prev) => {
+      const newValue = e.key === 'Backspace' 
+        ? prev.message.slice(0, -1) 
+        : prev.message + e.key;
+      alert(`Manually updated value: ${newValue}`);
+      return { ...prev, message: newValue };
+    });
+  }
+};
 
      const sendDataToBot = async () => {
        if (isSubmitting) return;
@@ -130,19 +143,19 @@ import React, { useEffect, useState } from 'react';
              className="input-field"
            />
            <textarea
-             name="message"
-             defaultValue={formData.message}
-             onChange={handleInputChange}
-             onKeyDown={(e) => alert(`Key pressed: ${e.key}`)}
-             onFocus={() => alert('Textarea focused')}
-             onClick={(e) => {
-               alert('Textarea clicked');
-               e.target.focus();
-             }}
-             placeholder="Опиши, какой бот нужен"
-             className="input-field textarea"
-             autoFocus
-           />
+              name="message"
+              value={formData.message} // Вернемся к управляемому компоненту
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onFocus={() => alert('Textarea focused')}
+              onClick={(e) => {
+                alert('Textarea clicked');
+                e.target.focus();
+              }}
+              placeholder="Опиши, какой бот нужен"
+              className="input-field textarea"
+              autoFocus
+            />
            <p>Текущий текст в textarea: {formData.message}</p>
            <button onClick={sendDataToBot} disabled={isSubmitting}>
              {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
