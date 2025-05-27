@@ -137,6 +137,22 @@
 .textarea {
   min-height: 100px;
   resize: vertical;
+  caret-color: #00A3E0 !important; /* Яркий курсор, сочетается с темой */
+  -webkit-caret-color: #00A3E0 !important; /* Для WebKit */
+  -moz-caret-color: #00A3E0 !important; /* Для Firefox */
+}
+
+.textarea:focus {
+  outline: 2px solid #00A3E0;
+  caret-color: #00A3E0 !important;
+  -webkit-caret-color: #00A3E0 !important;
+  -moz-caret-color: #00A3E0 !important;
+  animation: blink-caret 0.75s step-end infinite !important; /* Мигание курсора */
+}
+
+@keyframes blink-caret {
+  from, to { caret-color: transparent; }
+  50% { caret-color: #00A3E0; }
 }
 
 button {

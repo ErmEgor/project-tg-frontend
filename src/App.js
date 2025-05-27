@@ -9,42 +9,47 @@ import React, { useEffect, useState } from 'react';
      useEffect(() => {
        const tg = window.Telegram?.WebApp;
        if (tg) {
-         alert('Web App инициализирован: ' + JSON.stringify(tg.initDataUnsafe));
          tg.ready();
          tg.expand();
          if (tg.initDataUnsafe?.user) {
-           alert(`Пользователь: ID ${tg.initDataUnsafe.user.id}, Имя: ${tg.initDataUnsafe.user.first_name || 'не указано'}`);
            setUser(tg.initDataUnsafe.user);
            setFormData((prev) => ({
              ...prev,
              name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
            }));
-         } else {
-           alert('Пользователь не найден в initDataUnsafe');
          }
-       } else {
-         alert('Telegram Web App не инициализирован');
        }
      }, []);
 
      const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  alert(`Input changed: name=${name}, value=${value}`);
-  setFormData((prev) => ({ ...prev, [name]: value }));
-};
+       const { name, value } = e.target;
+       alert(`Input changed: name=${name}, value=${value}`);
+       setFormData((prev) => ({ ...prev, [name]: value }));
+     };
 
-const handleKeyDown = (e) => {
-  alert(`Key pressed: ${e.key}`);
-  if (e.key.length === 1 || e.key === 'Backspace') {
-    setFormData((prev) => {
-      const newValue = e.key === 'Backspace' 
-        ? prev.message.slice(0, -1) 
-        : prev.message + e.key;
-      alert(`Manually updated value: ${newValue}`);
-      return { ...prev, message: newValue };
-    });
-  }
-};
+     const handleKeyDown = (e) => {
+       alert(`Key pressed: ${e.key}`);
+       if (e.key.length === 1) {
+         setFormData((prev) => {
+           const newValue = prev.message + e.key;
+           alert(`Manually updated value: ${newValue}`);
+           return { ...prev, message: newValue };
+         });
+       } else if (e.key === 'Backspace') {
+         setFormData((prev) => {
+           const newValue = prev.message.slice(0, -1);
+           alert(`Manually updated value: ${newValue}`);
+           return { ...prev, message: newValue };
+         });
+       } else if (e.key === 'Enter') {
+         setFormData((prev) => {
+           const newValue = prev.message + '\n';
+           alert(`Manually updated value: ${newValue}`);
+           return { ...prev, message: newValue };
+         });
+         e.preventDefault();
+       }
+     };
 
      const sendDataToBot = async () => {
        if (isSubmitting) return;
@@ -143,19 +148,14 @@ const handleKeyDown = (e) => {
              className="input-field"
            />
            <textarea
-              name="message"
-              value={formData.message} // Вернемся к управляемому компоненту
-              onChange={handleInputChange}
-              onKeyDown={handleKeyDown}
-              onFocus={() => alert('Textarea focused')}
-              onClick={(e) => {
-                alert('Textarea clicked');
-                e.target.focus();
-              }}
-              placeholder="Опиши, какой бот нужен"
-              className="input-field textarea"
-              autoFocus
-            />
+             name="message"
+             value={formData.message}
+             onChange={handleInputChange}
+             onKeyDown={handleKeyDown}
+             placeholder="Опиши, какой бот нужен"
+             className="input-field textarea"
+             autoFocus
+           />
            <p>Текущий текст в textarea: {formData.message}</p>
            <button onClick={sendDataToBot} disabled={isSubmitting}>
              {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
