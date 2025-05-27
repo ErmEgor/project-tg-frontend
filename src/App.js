@@ -144,6 +144,11 @@ function App() {
         onFocus={() => alert('Textarea focused')}
         placeholder="Опиши, какой бот нужен"
         className="input-field textarea"
+        autoFocus
+        onClick={() => {
+          alert('Textarea clicked');
+          e.target.focus();
+        }}
         />
         <button onClick={sendDataToBot} disabled={isSubmitting}>
           {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
