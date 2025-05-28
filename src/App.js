@@ -56,15 +56,15 @@ function App() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-        window.Telegram.WebApp.showAlert('Таймаут fetch сработал');
-      }, 5000); // Таймаут 5 секунд
+        window.Telegram.WebApp.showAlert('Таймаут fetch сработал после 3 секунд');
+      }, 3000); // Уменьшаем таймаут до 3 секунд для быстрой отладки
       try {
         const response = await fetch('https://project-tg-server.onrender.com/submit', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
           signal: controller.signal,
-          mode: 'cors', // Явно указываем режим CORS
+          mode: 'cors',
         });
         clearTimeout(timeoutId);
         window.Telegram.WebApp.showAlert('Запрос отправлен, статус: ' + response.status);
@@ -77,9 +77,9 @@ function App() {
         }
       } catch (error) {
         if (error.name === 'AbortError') {
-          throw new Error('Таймаут: сервер не ответил за 5 секунд');
+          throw new Error('Таймаут: сервер не ответил за 3 секунды');
         }
-        throw error;
+        throw new Error('Ошибка fetch: ' + error.message); // Более подробная отладка
       }
     } catch (error) {
       window.Telegram.WebApp.showAlert('Ошибка связи с сервером: ' + error.message);
