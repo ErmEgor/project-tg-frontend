@@ -61,7 +61,7 @@ function App() {
       }, 3000); // Таймаут 3 секунды
       const controller = new AbortController();
       try {
-        const response = await fetch('https://project-tg-server.onrender.com/submit', {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json; charset=utf-8' },
           body: JSON.stringify(formData),
