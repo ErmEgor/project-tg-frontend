@@ -54,20 +54,30 @@ function App() {
     try {
       window.Telegram.WebApp.showAlert('Отправляем на сервер: ' + JSON.stringify(formData));
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // Таймаут 5 секунд
-      const response = await fetch('https://project-tg-server.onrender.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
-      const result = await response.json();
-      if (response.ok) {
-        window.Telegram.WebApp.showAlert('Заявка успешно отправлена на сервер!');
-        setFormData({ name: user?.first_name || `Пользователь ${user?.id}`, message: '' });
-      } else {
-        window.Telegram.WebApp.showAlert('Ошибка сервера: ' + (result.message || 'Неизвестная ошибка'));
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+        window.Telegram.WebApp.showAlert('Таймаут fetch сработал'); // Отладка
+      }, 5000); // Таймаут 5 секунд
+      try {
+        const response = await fetch('https://project-tg-server.onrender.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        const result = await response.json();
+        if (response.ok) {
+          window.Telegram.WebApp.showAlert('Заявка успешно отправлена на сервер!');
+          setFormData({ name: user?.first_name || `Пользователь ${user?.id}`, message: '' });
+        } else {
+          window.Telegram.WebApp.showAlert('Ошибка сервера: ' + (result.message || 'Неизвестная ошибка'));
+        }
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Таймаут: сервер не ответил за 5 секунд');
+        }
+        throw error;
       }
     } catch (error) {
       window.Telegram.WebApp.showAlert('Ошибка связи с сервером: ' + error.message);
@@ -79,7 +89,6 @@ function App() {
     if (tg) {
       tg.MainButton.hide();
       window.Telegram.WebApp.showAlert('Возврат к основному меню (закрытие не работает).');
-      // tg.close(); // Оставляем закомментированным
     } else {
       window.alert('Это действие доступно только в Telegram.');
     }
@@ -95,30 +104,30 @@ function App() {
           </p>
         )}
       </header>
-      <section className="skills">
+      <section class="skills">
         <h2>Мои навыки</h2>
         <p>Я создаю Telegram-ботов и веб-приложения. Мои проекты — это сочетание функциональности, современного дизайна и удобства.</p>
       </section>
-      <section className="projects">
+      <section class="projects">
         <h2>Мои проекты</h2>
-        <div className="project-grid">
-          <div className="project-card">
+        <div class="project-grid">
+          <div class="project-card">
             <h3>Лендинг</h3>
             <p>Одностраничный сайт с красивым дизайном и рабочими кнопками.</p>
-            <a href="https://ermegor.github.io/BuildMax/" target="_blank" rel="noopener noreferrer" className="project-button">
+            <a href="https://ermegor.github.io/BuildMax/" target="_blank" rel="noopener noreferrer" class="project-button">
               Посмотреть
             </a>
           </div>
-          <div className="project-card">
+          <div class="project-card">
             <h3>Telegram-бот</h3>
             <p>Интерактивный бот для общения и демонстрации навыков.</p>
-            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" class="project-button">
               Перейти к боту
             </a>
           </div>
         </div>
       </section>
-      <section className="contact-form">
+      <section class="contact-form">
         <h2>Заказать услуги</h2>
         <input
           type="text"
@@ -126,14 +135,14 @@ function App() {
           value={formData.name}
           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
           placeholder="Твоё имя"
-          className="input-field"
+          class="input-field"
         />
         <textarea
           name="message"
           value={formData.message}
           onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
           placeholder="Опиши, какой бот нужен"
-          className="input-field textarea"
+          class="input-field textarea"
           autoFocus
           autoComplete="off"
           autoCorrect="off"
@@ -143,7 +152,7 @@ function App() {
           {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
         </button>
       </section>
-      <button className="close-button" onClick={goBackToBot}>
+      <button class="close-button" onClick={goBackToBot}>
         Вернуться к боту
       </button>
     </div>
