@@ -53,20 +53,23 @@ function App() {
   const sendToServer = async () => {
     try {
       window.Telegram.WebApp.showAlert('Отправляем на сервер: ' + JSON.stringify(formData));
-      const controller = new AbortController();
+      let timeoutTriggered = false;
       const timeoutId = setTimeout(() => {
-        controller.abort();
-        window.Telegram.WebApp.showAlert('Таймаут fetch сработал после 3 секунд');
-      }, 3000); // Уменьшаем таймаут до 3 секунд для быстрой отладки
+        timeoutTriggered = true;
+        window.Telegram.WebApp.showAlert('Таймаут сработал после 3 секунд');
+        throw new Error('Таймаут: сервер не ответил за 3 секунды');
+      }, 3000); // Таймаут 3 секунды
+      const controller = new AbortController();
       try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
+        const response = await fetch('https://project-tg-server.onrender.com/submit', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
           body: JSON.stringify(formData),
           signal: controller.signal,
           mode: 'cors',
         });
         clearTimeout(timeoutId);
+        if (timeoutTriggered) return; // Если таймаут уже сработал, не продолжаем
         window.Telegram.WebApp.showAlert('Запрос отправлен, статус: ' + response.status);
         const result = await response.json();
         if (response.ok) {
@@ -76,10 +79,11 @@ function App() {
           window.Telegram.WebApp.showAlert('Ошибка сервера: ' + (result.message || 'Неизвестная ошибка'));
         }
       } catch (error) {
+        clearTimeout(timeoutId);
         if (error.name === 'AbortError') {
           throw new Error('Таймаут: сервер не ответил за 3 секунды');
         }
-        throw new Error('Ошибка fetch: ' + error.message); // Более подробная отладка
+        throw new Error('Ошибка fetch: ' + error.message);
       }
     } catch (error) {
       window.Telegram.WebApp.showAlert('Ошибка связи с сервером: ' + error.message);
