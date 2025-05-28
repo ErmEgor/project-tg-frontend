@@ -59,7 +59,7 @@ function App() {
         window.Telegram.WebApp.showAlert('Таймаут fetch сработал после 3 секунд');
       }, 3000); // Уменьшаем таймаут до 3 секунд для быстрой отладки
       try {
-        const response = await fetch('https://project-tg-server.onrender.com/submit', {
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
