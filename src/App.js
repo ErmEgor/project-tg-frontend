@@ -29,6 +29,14 @@ function App() {
     }
   }, []);
 
+  // Функция для установки таймаута на Promise
+  const withTimeout = (promise, timeoutMs) => {
+    const timeout = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Таймаут: Telegram не ответил')), timeoutMs);
+    });
+    return Promise.race([promise, timeout]);
+  };
+
   const sendDataToBot = async () => {
     if (isSubmitting) {
       window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
@@ -44,7 +52,7 @@ function App() {
       try {
         const data = JSON.stringify(formData);
         window.Telegram.WebApp.showAlert('Отправляем данные в Telegram: ' + data);
-        await tg.sendData(data);
+        await withTimeout(tg.sendData(data), 5000); // Таймаут 5 секунд
         window.Telegram.WebApp.showAlert('Заявка успешно отправлена боту!');
         setFormData({ name: user?.first_name || `Пользователь ${user?.id}`, message: '' });
       } catch (error) {
