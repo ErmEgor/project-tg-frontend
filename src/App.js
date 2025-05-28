@@ -29,12 +29,13 @@ function App() {
     }
   }, []);
 
-  // Функция для установки таймаута на Promise
-  const withTimeout = (promise, timeoutMs) => {
-    const timeout = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Таймаут: Telegram не ответил')), timeoutMs);
+  // Функция для установки таймаута с явным контролем
+  const withTimeout = (promise, timeoutMs, errorMessage) => {
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
     });
-    return Promise.race([promise, timeout]);
+    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
   };
 
   const sendDataToBot = async () => {
@@ -52,9 +53,8 @@ function App() {
       try {
         const data = JSON.stringify(formData);
         window.Telegram.WebApp.showAlert('Отправляем данные в Telegram: ' + data);
-        await withTimeout(tg.sendData(data), 5000); // Таймаут 5 секунд
+        await withTimeout(tg.sendData(data), 5000, 'Таймаут: Telegram не ответил');
         window.Telegram.WebApp.showAlert('Заявка успешно отправлена боту!');
-        setFormData({ name: user?.first_name || `Пользователь ${user?.id}`, message: '' });
       } catch (error) {
         window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + error.message + '. Пробуем сервер...');
         await sendToServer();
@@ -63,7 +63,8 @@ function App() {
       window.Telegram.WebApp.showAlert('Telegram WebApp недоступен, отправляем на сервер.');
       await sendToServer();
     }
-    setIsSubmitting(false);
+    setIsSubmitting(false); // Убедимся, что кнопка разблокируется
+    window.Telegram.WebApp.showAlert('Завершение отправки'); // Отладочный алерт
   };
 
   const sendToServer = async () => {
@@ -89,8 +90,12 @@ function App() {
   const goBackToBot = () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
-      tg.close();
-      window.Telegram.WebApp.showAlert('Закрываем Web App, возврат к боту.');
+      try {
+        tg.close();
+        window.Telegram.WebApp.showAlert('Закрываем Web App, возврат к боту.');
+      } catch (error) {
+        window.Telegram.WebApp.showAlert('Ошибка при закрытии: ' + error.message);
+      }
     } else {
       window.alert('Это действие доступно только в Telegram.');
     }
