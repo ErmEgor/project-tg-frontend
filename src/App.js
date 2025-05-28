@@ -29,15 +29,6 @@ function App() {
     }
   }, []);
 
-  // Функция для установки таймаута с явным контролем
-  const withTimeout = (promise, timeoutMs, errorMessage) => {
-    let timeoutId;
-    const timeoutPromise = new Promise((_, reject) => {
-      timeoutId = setTimeout(() => reject(new Error(errorMessage)), timeoutMs);
-    });
-    return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
-  };
-
   const sendDataToBot = async () => {
     if (isSubmitting) {
       window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
@@ -48,23 +39,16 @@ function App() {
       return;
     }
     setIsSubmitting(true);
-    const tg = window.Telegram?.WebApp;
-    if (tg && tg.initDataUnsafe?.user) {
-      try {
-        const data = JSON.stringify(formData);
-        window.Telegram.WebApp.showAlert('Отправляем данные в Telegram: ' + data);
-        await withTimeout(tg.sendData(data), 5000, 'Таймаут: Telegram не ответил');
-        window.Telegram.WebApp.showAlert('Заявка успешно отправлена боту!');
-      } catch (error) {
-        window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + error.message + '. Пробуем сервер...');
-        await sendToServer();
-      }
-    } else {
-      window.Telegram.WebApp.showAlert('Telegram WebApp недоступен, отправляем на сервер.');
+    try {
+      // Временно отключаем tg.sendData и сразу идём на сервер
+      window.Telegram.WebApp.showAlert('Пропускаем Telegram, отправляем на сервер...');
       await sendToServer();
+    } catch (error) {
+      window.Telegram.WebApp.showAlert('Ошибка: ' + error.message);
+    } finally {
+      setIsSubmitting(false);
+      window.Telegram.WebApp.showAlert('Завершение отправки');
     }
-    setIsSubmitting(false); // Убедимся, что кнопка разблокируется
-    window.Telegram.WebApp.showAlert('Завершение отправки'); // Отладочный алерт
   };
 
   const sendToServer = async () => {
@@ -88,15 +72,15 @@ function App() {
   };
 
   const goBackToBot = () => {
-  const tg = window.Telegram?.WebApp;
-  if (tg) {
-    tg.MainButton.hide(); // Скрыть кнопку, если есть
-    window.Telegram.WebApp.showAlert('Возврат к основному меню (закрытие не работает).');
-    // tg.close(); // Временно закомментируй
-  } else {
-    window.alert('Это действие доступно только в Telegram.');
-  }
-};
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.MainButton.hide();
+      window.Telegram.WebApp.showAlert('Возврат к основному меню (закрытие не работает).');
+      // tg.close(); // Оставляем закомментированным
+    } else {
+      window.alert('Это действие доступно только в Telegram.');
+    }
+  };
 
   return (
     <div className="App">
