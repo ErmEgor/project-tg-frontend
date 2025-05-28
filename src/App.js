@@ -74,14 +74,15 @@ const sendToServer = async () => {
 };
 
   const goBackToBot = () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.sendData(JSON.stringify({ action: 'back' }));
-      console.log('Отправлен запрос на возврат в меню бота');
-    } else {
-      console.log('Это действие доступно только в Telegram.');
-    }
-  };
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.close();
+    console.log('Web App закрыт, возврат к боту');
+  } else {
+    console.log('Это действие доступно только в Telegram.');
+    window.Telegram.WebApp.showAlert('Это действие доступно только в Telegram.');
+  }
+};
 
   return (
     <div className="App">
