@@ -39,55 +39,22 @@ function App() {
       return;
     }
     setIsSubmitting(true);
-    try {
-      window.Telegram.WebApp.showAlert('Пропускаем Telegram, отправляем на сервер...');
-      await sendToServer();
-    } catch (error) {
-      window.Telegram.WebApp.showAlert('Ошибка: ' + error.message);
-    } finally {
-      setIsSubmitting(false);
-      window.Telegram.WebApp.showAlert('Завершение отправки');
-    }
-  };
-
-  const sendToServer = async () => {
-    try {
-      window.Telegram.WebApp.showAlert('Отправляем на сервер: ' + JSON.stringify(formData));
-      let timeoutTriggered = false;
-      const timeoutId = setTimeout(() => {
-        timeoutTriggered = true;
-        window.Telegram.WebApp.showAlert('Таймаут сработал после 3 секунд');
-        throw new Error('Таймаут: сервер не ответил за 3 секунды');
-      }, 3000); // Таймаут 3 секунды
-      const controller = new AbortController();
+    const tg = window.Telegram?.WebApp;
+    if (tg && tg.initDataUnsafe?.user) {
       try {
-        const response = await fetch('https://jsonplaceholder.typicode.com/posts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json; charset=utf-8' },
-          body: JSON.stringify(formData),
-          signal: controller.signal,
-          mode: 'cors',
-        });
-        clearTimeout(timeoutId);
-        if (timeoutTriggered) return; // Если таймаут уже сработал, не продолжаем
-        window.Telegram.WebApp.showAlert('Запрос отправлен, статус: ' + response.status);
-        const result = await response.json();
-        if (response.ok) {
-          window.Telegram.WebApp.showAlert('Заявка успешно отправлена на сервер!');
-          setFormData({ name: user?.first_name || `Пользователь ${user?.id}`, message: '' });
-        } else {
-          window.Telegram.WebApp.showAlert('Ошибка сервера: ' + (result.message || 'Неизвестная ошибка'));
-        }
+        const data = JSON.stringify(formData);
+        window.Telegram.WebApp.showAlert('Отправляем данные через Telegram: ' + data);
+        // Отправляем данные через tg.sendData
+        tg.sendData(data);
+        window.Telegram.WebApp.showAlert('Данные отправлены через Telegram, ожидаем ответа...');
       } catch (error) {
-        clearTimeout(timeoutId);
-        if (error.name === 'AbortError') {
-          throw new Error('Таймаут: сервер не ответил за 3 секунды');
-        }
-        throw new Error('Ошибка fetch: ' + error.message);
+        window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + error.message);
       }
-    } catch (error) {
-      window.Telegram.WebApp.showAlert('Ошибка связи с сервером: ' + error.message);
+    } else {
+      window.Telegram.WebApp.showAlert('Telegram WebApp недоступен.');
     }
+    setIsSubmitting(false);
+    window.Telegram.WebApp.showAlert('Завершение отправки');
   };
 
   const goBackToBot = () => {
