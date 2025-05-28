@@ -88,18 +88,15 @@ function App() {
   };
 
   const goBackToBot = () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-      try {
-        tg.close();
-        window.Telegram.WebApp.showAlert('Закрываем Web App, возврат к боту.');
-      } catch (error) {
-        window.Telegram.WebApp.showAlert('Ошибка при закрытии: ' + error.message);
-      }
-    } else {
-      window.alert('Это действие доступно только в Telegram.');
-    }
-  };
+  const tg = window.Telegram?.WebApp;
+  if (tg) {
+    tg.MainButton.hide(); // Скрыть кнопку, если есть
+    window.Telegram.WebApp.showAlert('Возврат к основному меню (закрытие не работает).');
+    // tg.close(); // Временно закомментируй
+  } else {
+    window.alert('Это действие доступно только в Telegram.');
+  }
+};
 
   return (
     <div className="App">
