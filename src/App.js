@@ -40,7 +40,6 @@ function App() {
     }
     setIsSubmitting(true);
     try {
-      // Временно отключаем tg.sendData и сразу идём на сервер
       window.Telegram.WebApp.showAlert('Пропускаем Telegram, отправляем на сервер...');
       await sendToServer();
     } catch (error) {
@@ -54,11 +53,15 @@ function App() {
   const sendToServer = async () => {
     try {
       window.Telegram.WebApp.showAlert('Отправляем на сервер: ' + JSON.stringify(formData));
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // Таймаут 5 секунд
       const response = await fetch('https://project-tg-server.onrender.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        signal: controller.signal
       });
+      clearTimeout(timeoutId);
       const result = await response.json();
       if (response.ok) {
         window.Telegram.WebApp.showAlert('Заявка успешно отправлена на сервер!');
