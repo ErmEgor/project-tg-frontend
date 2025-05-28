@@ -24,30 +24,6 @@ function App() {
     }
   }, []);
 
-  const handleKeyDown = (e) => {
-    console.log(`Key pressed: ${e.key}`);
-    if (e.key.length === 1) {
-      setFormData((prev) => {
-        const newValue = prev.message + e.key;
-        console.log(`Updated value: ${newValue}`);
-        return { ...prev, message: newValue };
-      });
-    } else if (e.key === 'Backspace') {
-      setFormData((prev) => {
-        const newValue = prev.message.slice(0, -1);
-        console.log(`Updated value: ${newValue}`);
-        return { ...prev, message: newValue };
-      });
-    } else if (e.key === 'Enter') {
-      setFormData((prev) => {
-        const newValue = prev.message + '\n';
-        console.log(`Updated value: ${newValue}`);
-        return { ...prev, message: newValue };
-      });
-      e.preventDefault();
-    }
-  };
-
   const sendDataToBot = async () => {
     if (isSubmitting) return;
     if (!formData.name || !formData.message) {
@@ -145,12 +121,15 @@ function App() {
           className="input-field"
         />
         <textarea
-          name="message"
-          value={formData.message}
-          onKeyDown={handleKeyDown}
-          placeholder="Опиши, какой бот нужен"
-          className="input-field textarea"
-          autoFocus
+        name="message"
+        value={formData.message}
+        onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+        placeholder="Опиши, какой бот нужен"
+        className="input-field textarea"
+        autoFocus
+        autoComplete="off"
+        autoCorrect="off"
+        spellCheck="false"
         />
         <button onClick={sendDataToBot} disabled={isSubmitting}>
           {isSubmitting ? 'Отправка...' : 'Отправить заявку'}
