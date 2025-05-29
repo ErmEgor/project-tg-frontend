@@ -30,8 +30,13 @@ function App() {
       window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
       return;
     }
-    if (!formData.name || !formData.message) {
-      window.Telegram.WebApp.showAlert('Ошибка: заполните имя и сообщение!');
+    if (!formData.name || !formData.contact || !formData.message) {
+      window.Telegram.WebApp.showAlert('Ошибка: заполните все поля!');
+      return;
+    }
+    // Валидация формата contact (Telegram-username или email)
+    if (!formData.contact.match(/^(@[A-Za-z0-9_]{5,32}|[^@]+@[^@]+\.[^@]+)$/)) {
+      window.Telegram.WebApp.showAlert('Ошибка: введите корректный Telegram (@username) или email!');
       return;
     }
     setIsSubmitting(true);
