@@ -30,32 +30,51 @@ function App() {
   }, []);
 
   const sendDataToBot = async () => {
-    if (isSubmitting) {
-      window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
-      return;
+  if (isSubmitting) {
+    window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
+    return;
+  }
+  if (!formData.name || !formData.message) {
+    window.Telegram.WebApp.showAlert('Ошибка: заполните имя и сообщение!');
+    return;
+  }
+  setIsSubmitting(true);
+  const tg = window.Telegram?.WebApp;
+
+  // Попытка отправки через сервер
+  try {
+    const response = await fetch('https://project-tg-bot.onrender.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+    const result = await response.json();
+    if (response.ok && result.status === 'success') {
+      window.Telegram.WebApp.showAlert('Заявка успешно отправлена через сервер!');
+      setFormData({ name: '', message: '' }); // Очищаем форму
+    } else {
+      throw new Error(result.message || 'Ошибка сервера');
     }
-    if (!formData.name || !formData.message) {
-      window.Telegram.WebApp.showAlert('Ошибка: заполните имя и сообщение!');
-      return;
-    }
-    setIsSubmitting(true);
-    const tg = window.Telegram?.WebApp;
+  } catch (error) {
+    window.Telegram.WebApp.showAlert('Ошибка отправки через сервер: ' + error.message);
+    // Попытка отправки через tg.sendData как запасной вариант
     if (tg && tg.initDataUnsafe?.user) {
       try {
         const data = JSON.stringify(formData);
-        window.Telegram.WebApp.showAlert('Отправляем данные через Telegram: ' + data);
-        // Отправляем данные через tg.sendData
+        window.Telegram.WebApp.showAlert('Пробуем отправить через Telegram: ' + data);
         tg.sendData(data);
         window.Telegram.WebApp.showAlert('Данные отправлены через Telegram, ожидаем ответа...');
-      } catch (error) {
-        window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + error.message);
+      } catch (tgError) {
+        window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + tgError.message);
       }
     } else {
       window.Telegram.WebApp.showAlert('Telegram WebApp недоступен.');
     }
-    setIsSubmitting(false);
-    window.Telegram.WebApp.showAlert('Завершение отправки');
-  };
+  }
+  setIsSubmitting(false);
+};
 
   const goBackToBot = () => {
     const tg = window.Telegram?.WebApp;
