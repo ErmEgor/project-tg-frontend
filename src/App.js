@@ -47,25 +47,25 @@ function App() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
       body: JSON.stringify(formData),
     });
     const result = await response.json();
     if (response.ok && result.status === 'success') {
-      window.Telegram.WebApp.showAlert('Заявка успешно отправлена через сервер!');
-      setFormData({ name: '', message: '' }); // Очищаем форму
+      window.Telegram.WebApp.showAlert('Заявка успешно отправлена!');
+      setFormData({ name: '', message: '' });
     } else {
       throw new Error(result.message || 'Ошибка сервера');
     }
   } catch (error) {
-    window.Telegram.WebApp.showAlert('Ошибка отправки через сервер: ' + error.message);
-    // Попытка отправки через tg.sendData как запасной вариант
+    window.Telegram.WebApp.showAlert('Ошибка отправки: ' + error.message);
+    // Попытка через tg.sendData
     if (tg && tg.initDataUnsafe?.user) {
       try {
         const data = JSON.stringify(formData);
-        window.Telegram.WebApp.showAlert('Пробуем отправить через Telegram: ' + data);
         tg.sendData(data);
-        window.Telegram.WebApp.showAlert('Данные отправлены через Telegram, ожидаем ответа...');
+        window.Telegram.WebApp.showAlert('Заявка отправлена через Telegram, ожидаем ответа...');
       } catch (tgError) {
         window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + tgError.message);
       }
