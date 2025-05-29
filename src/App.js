@@ -41,7 +41,7 @@ function App() {
   setIsSubmitting(true);
   const tg = window.Telegram?.WebApp;
 
-  // Попытка отправки через сервер
+  // Попытка отправки через серверs
   try {
     const response = await fetch('https://project-tg-bot.onrender.com/submit', {
       method: 'POST',
