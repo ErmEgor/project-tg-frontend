@@ -3,7 +3,7 @@ import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);
-  const [formData, setFormData] = useState({ name: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', contact: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -16,6 +16,7 @@ function App() {
         setFormData((prev) => ({
           ...prev,
           name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
+          contact: tg.initDataUnsafe.user.username ? `@${tg.initDataUnsafe.user.username}` : '',
         }));
       }
       setTimeout(() => {
@@ -47,7 +48,7 @@ function App() {
       const result = await response.json();
       if (response.ok && result.status === 'success') {
         window.Telegram.WebApp.showAlert('Заявка успешно отправлена!');
-        setFormData({ name: formData.name, message: '' });
+        setFormData((prev) => ({ ...prev, message: '' }));
       } else {
         throw new Error(result.message || 'Ошибка сервера');
       }
@@ -107,6 +108,14 @@ function App() {
           value={formData.name}
           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
           placeholder="Твоё имя"
+          className="input-field"
+        />
+        <input
+          type="text"
+          name="contact"
+          value={formData.contact}
+          onChange={(e) => setFormData((prev) => ({ ...prev, contact: e.target.value }))}
+          placeholder="Telegram (@username) или email"
           className="input-field"
         />
         <textarea
