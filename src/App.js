@@ -17,72 +17,52 @@ function App() {
           ...prev,
           name: tg.initDataUnsafe.user.first_name || `Пользователь ${tg.initDataUnsafe.user.id}`,
         }));
-        tg.showAlert('Web App инициализирован, пользователь: ' + (tg.initDataUnsafe.user.first_name || 'Неизвестно'));
-      } else {
-        tg.showAlert('Пользователь Telegram не найден!');
       }
       setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 100);
-    } else {
-      window.alert('Telegram WebApp недоступен! Открыто вне Telegram.');
     }
   }, []);
 
   const sendDataToBot = async () => {
-  if (isSubmitting) {
-    window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
-    return;
-  }
-  if (!formData.name || !formData.message) {
-    window.Telegram.WebApp.showAlert('Ошибка: заполните имя и сообщение!');
-    return;
-  }
-  setIsSubmitting(true);
-  const tg = window.Telegram?.WebApp;
+    if (isSubmitting) {
+      window.Telegram.WebApp.showAlert('Отправка уже выполняется, подождите.');
+      return;
+    }
+    if (!formData.name || !formData.message) {
+      window.Telegram.WebApp.showAlert('Ошибка: заполните имя и сообщение!');
+      return;
+    }
+    setIsSubmitting(true);
 
-  // Попытка отправки через сервер
-  try {
-    const response = await fetch('https://project-tg-bot.onrender.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-    const result = await response.json();
-    if (response.ok && result.status === 'success') {
-      window.Telegram.WebApp.showAlert('Заявка успешно отправлена!');
-      setFormData({ name: '', message: '' });
-    } else {
-      throw new Error(result.message || 'Ошибка сервера');
-    }
-  } catch (error) {
-    window.Telegram.WebApp.showAlert('Ошибка отправки: ' + error.message);
-    // Попытка через tg.sendData
-    if (tg && tg.initDataUnsafe?.user) {
-      try {
-        const data = JSON.stringify(formData);
-        tg.sendData(data);
-        window.Telegram.WebApp.showAlert('Заявка отправлена через Telegram, ожидаем ответа...');
-      } catch (tgError) {
-        window.Telegram.WebApp.showAlert('Ошибка Telegram: ' + tgError.message);
+    try {
+      const response = await fetch('https://project-tg-bot.onrender.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      const result = await response.json();
+      if (response.ok && result.status === 'success') {
+        window.Telegram.WebApp.showAlert('Заявка успешно отправлена!');
+        setFormData({ name: formData.name, message: '' });
+      } else {
+        throw new Error(result.message || 'Ошибка сервера');
       }
-    } else {
-      window.Telegram.WebApp.showAlert('Telegram WebApp недоступен.');
+    } catch (error) {
+      window.Telegram.WebApp.showAlert('Ошибка отправки: ' + error.message);
     }
-  }
-  setIsSubmitting(false);
-};
+    setIsSubmitting(false);
+  };
 
   const goBackToBot = () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
       tg.MainButton.hide();
-      window.Telegram.WebApp.showAlert('Возврат к основному меню (закрытие не работает).');
-    } else {
-      window.alert('Это действие доступно только в Telegram.');
+      const data = JSON.stringify({ action: 'back' });
+      tg.sendData(data);
     }
   };
 
