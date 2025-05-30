@@ -66,9 +66,16 @@ function App() {
   const goBackToBot = () => {
     const tg = window.Telegram?.WebApp;
     if (tg) {
-      tg.MainButton.hide();
-      const data = JSON.stringify({ action: 'back' });
-      tg.sendData(data);
+      try {
+        tg.ready(); // Повторная инициализация для надёжности
+        tg.close(); // Закрываем WebApp, возвращая в чат с ботом
+      } catch (error) {
+        console.error('Ошибка при закрытии WebApp:', error);
+        window.Telegram.WebApp.showAlert('Не удалось вернуться к боту: ' + error.message);
+      }
+    } else {
+      console.error('Telegram WebApp API недоступен');
+      window.alert('Ошибка: Telegram WebApp API недоступен. Попробуйте открыть приложение через Telegram.');
     }
   };
 
