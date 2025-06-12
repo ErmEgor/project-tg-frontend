@@ -96,20 +96,36 @@ function App() {
       <section className="projects">
         <h2>Мои проекты</h2>
         <div className="project-grid">
+          {/* ----- НАЧАЛО ИЗМЕНЕНИЙ ----- */}
           <div className="project-card">
-            <h3>Лендинг</h3>
-            <p>Одностраничный сайт с красивым дизайном и рабочими кнопками.</p>
-            <a href="https://ermegor.github.io/BuildMax/" target="_blank" rel="noopener noreferrer" className="project-button">
-              Посмотреть
-            </a>
-          </div>
-          <div className="project-card">
-            <h3>Telegram-бот</h3>
-            <p>Интерактивный бот для общения и демонстрации навыков.</p>
+            <h3>Бот-визитка</h3>
+            <p>Интерактивный бот для общения и демонстрации ваших услуг.</p>
             <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
               Перейти к боту
             </a>
           </div>
+          <div className="project-card">
+            <h3>Бот-каталог</h3>
+            <p>Демонстрация товаров или услуг в удобном для клиента формате.</p>
+            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+              Перейти к боту
+            </a>
+          </div>
+          <div className="project-card">
+            <h3>Бот-отзывы</h3>
+            <p>Автоматизированный сбор и публикация отзывов от ваших клиентов.</p>
+            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+              Перейти к боту
+            </a>
+          </div>
+          <div className="project-card">
+            <h3>Бот для записи на услуги</h3>
+            <p>Позволяет клиентам записываться на ваши услуги онлайн 24/7.</p>
+            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+              Перейти к боту
+            </a>
+          </div>
+          {/* ----- КОНЕЦ ИЗМЕНЕНИЙ ----- */}
         </div>
       </section>
       <section className="contact-form">
