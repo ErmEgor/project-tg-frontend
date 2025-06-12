@@ -100,28 +100,28 @@ function App() {
           <div className="project-card">
             <h3>Бот-визитка</h3>
             <p>Интерактивный бот для общения и демонстрации ваших услуг.</p>
-            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+            <a href="https://t.me/eegorhelper_bot" target="_blank" rel="noopener noreferrer" className="project-button">
               Перейти к боту
             </a>
           </div>
           <div className="project-card">
             <h3>Бот-каталог</h3>
             <p>Демонстрация товаров или услуг в удобном для клиента формате.</p>
-            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+            <a href="https://t.me/techspherez_bot" target="_blank" rel="noopener noreferrer" className="project-button">
               Перейти к боту
             </a>
           </div>
           <div className="project-card">
             <h3>Бот-отзывы</h3>
             <p>Автоматизированный сбор и публикация отзывов от ваших клиентов.</p>
-            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+            <a href="https://t.me/aromagia_bot" target="_blank" rel="noopener noreferrer" className="project-button">
               Перейти к боту
             </a>
           </div>
           <div className="project-card">
             <h3>Бот для записи на услуги</h3>
             <p>Позволяет клиентам записываться на ваши услуги онлайн 24/7.</p>
-            <a href="https://t.me/prostof2p" target="_blank" rel="noopener noreferrer" className="project-button">
+            <a href="https://t.me/aeternaz_bot" target="_blank" rel="noopener noreferrer" className="project-button">
               Перейти к боту
             </a>
           </div>
