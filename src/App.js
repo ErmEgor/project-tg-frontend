@@ -34,7 +34,7 @@ function App() {
       window.Telegram.WebApp.showAlert('Ошибка: заполните все поля!');
       return;
     }
-    // Валидация формата contact (Telegram-username или email)
+    // Валидация формата contact (Telegram-username или email)1
     if (!formData.contact.match(/^(@[A-Za-z0-9_]{5,32}|[^@]+@[^@]+\.[^@]+)$/)) {
       window.Telegram.WebApp.showAlert('Ошибка: введите корректный Telegram (@username) или email!');
       return;
@@ -42,7 +42,7 @@ function App() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('https://project-tg-bot.onrender.com/submit', {
+      const response = await fetch('https://project-tg-bot-yhkr.onrender.com/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
